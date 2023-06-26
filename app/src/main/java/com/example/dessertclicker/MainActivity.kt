@@ -93,24 +93,24 @@ class MainActivity : ComponentActivity() {
         var revenue by rememberSaveable { mutableStateOf(0) } //доход
         var dessertsSold by rememberSaveable { mutableStateOf(0) } //продано дессертов
 
-        val currentDessertIndex by rememberSaveable { mutableStateOf(0) } //индекс текущего дессерта
+        val currentDessertIndex by rememberSaveable { mutableStateOf(0) } //индекс текущего десерта
 
-        var currentDessertPrice by rememberSaveable {
+        var currentDessertPrice by rememberSaveable {//цена текущего десерта
             mutableStateOf(desserts[currentDessertIndex].price)
         }
-        var currentDessertImageId by rememberSaveable {
+        var currentDessertImageId by rememberSaveable { //ID текущего десерта
             mutableStateOf(desserts[currentDessertIndex].imageId)
         }
 
         Scaffold(
-            topBar = {
+            topBar = { //верхний бар
                 val intentContext = LocalContext.current
                 DessertClickerAppBar(
                     onShareButtonClicked = {
-                        shareSoldDessertsInformation(
-                            intentContext = intentContext,
-                            dessertsSold = dessertsSold,
-                            revenue = revenue
+                        shareSoldDessertsInformation( //поделится инфой о кол-ве проданных и сумме дохода
+                            intentContext = intentContext, // НЕ ВРУБИЛ
+                            dessertsSold = dessertsSold, //кол-во проданных десертов
+                            revenue = revenue //доход
                         )
                     },
                     modifier = Modifier
@@ -119,8 +119,8 @@ class MainActivity : ComponentActivity() {
                 )
             }
         ) { contentPadding ->
-            DessertClickerScreen(
-                revenue = revenue,
+            DessertClickerScreen( //где это всё я пока хз
+                revenue = revenue, //доход, но где?
                 dessertsSold = dessertsSold,
                 dessertImageId = currentDessertImageId,
                 onDessertClicked = {
@@ -261,6 +261,7 @@ fun DessertClickerScreen(
 }
 
 @Composable
+//Компоуз который объединяет вывод на экран двух последних строк
 private fun TransactionInfo(
     revenue: Int,
     dessertsSold: Int,
@@ -282,19 +283,40 @@ private fun TransactionInfo(
     }
 }
 
+    @Composable
+    //Компоуз предпоследней строки, где Desserts sold и цифра
+    private fun DessertsSoldInfo(dessertsSold: Int, modifier: Modifier = Modifier) {
+        Row(
+            modifier = modifier,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                text = stringResource(R.string.dessert_sold),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+            Text(
+                text = dessertsSold.toString(),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+        }
+    }
+
 @Composable
+//Компоуз самой нижней строки, где Total Revenue и $сумма
 private fun RevenueInfo(revenue: Int, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-            text = stringResource(R.string.total_revenue),
+            text = stringResource(R.string.total_revenue), //то что слева снизу Тотал Ревенью
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onSecondaryContainer
         )
         Text(
-            text = "$${revenue}",
+            text = "$${revenue}", //то что пишется в правом нижнем углу, цифра в баксах
             textAlign = TextAlign.Right,
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onSecondaryContainer
@@ -302,22 +324,6 @@ private fun RevenueInfo(revenue: Int, modifier: Modifier = Modifier) {
     }
 }
 
-@Composable
-private fun DessertsSoldInfo(dessertsSold: Int, modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Text(
-            text = stringResource(R.string.dessert_sold),
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSecondaryContainer
-        )
-        Text(
-            text = dessertsSold.toString(),
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSecondaryContainer
-        )
-    }
-}
+
+
 }
