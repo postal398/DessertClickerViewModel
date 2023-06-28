@@ -86,6 +86,7 @@ class MainActivity : ComponentActivity() {
 
 
     @Composable
+    //Самый основной Компоуз. Он уже стягивает всю структуру в себя
     private fun DessertClickerApp(
         desserts: List<Dessert> //лист передаётся из Datasource, тут всё ок
     ) {
@@ -102,13 +103,13 @@ class MainActivity : ComponentActivity() {
             mutableStateOf(desserts[currentDessertIndex].imageId)
         }
 
-        Scaffold(
+        Scaffold(//идёт внутри основго компоуза - DessertClickerApp
             topBar = { //верхний бар
                 val intentContext = LocalContext.current
                 DessertClickerAppBar(
                     onShareButtonClicked = {
                         shareSoldDessertsInformation( //поделится инфой о кол-ве проданных и сумме дохода
-                            intentContext = intentContext, // НЕ ВРУБИЛ
+                            intentContext = intentContext, // Интент - пока не знаю как работает
                             dessertsSold = dessertsSold, //кол-во проданных десертов
                             revenue = revenue //доход
                         )
@@ -119,8 +120,11 @@ class MainActivity : ComponentActivity() {
                 )
             }
         ) { contentPadding ->
-            DessertClickerScreen( //где это всё я пока хз
-                revenue = revenue, //доход, но где?
+            DessertClickerScreen( // Это вызов Основной UI, где стена, стол, блюдце,
+                // а на нём имзеняемое изображение с дессертом.
+                //А вывзывается это внутри САМОГО Основного DessertClickerApp
+
+                revenue = revenue, //
                 dessertsSold = dessertsSold,
                 dessertImageId = currentDessertImageId,
                 onDessertClicked = {
@@ -140,10 +144,8 @@ class MainActivity : ComponentActivity() {
     }
 
 
-/**
- * Determine which dessert to show.
- */
-fun determineDessertToShow(
+fun determineDessertToShow( //Определяет КАКОЙ десерт будет показан - НЕ Compose функция
+    //Используется DessertClickerScreen, который ОСНОВНОЙ UI Compose
     desserts: List<Dessert>,
     dessertsSold: Int
 ): Dessert {
@@ -163,9 +165,9 @@ fun determineDessertToShow(
     return dessertToShow
 }
 
-/**
+/** Хуй его как это работает, эти Интенты, кароче это функция, которая кста НЕ КОМПОУЗ, отвечает за обработку шейр
  * Share desserts sold information using ACTION_SEND intent
- */
+ */ //Эта функция используется в DessertClickerAppBar - Compose
 private fun shareSoldDessertsInformation(intentContext: Context, dessertsSold: Int, revenue: Int) {
     val sendIntent = Intent().apply {
         action = Intent.ACTION_SEND
@@ -192,6 +194,7 @@ private fun shareSoldDessertsInformation(intentContext: Context, dessertsSold: I
 
 
 @Composable
+//Компоуз для верхнего бара, где показывается имя приложения и кнопка share.
 private fun DessertClickerAppBar(
     onShareButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
@@ -201,13 +204,13 @@ private fun DessertClickerAppBar(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
+        Text(//Текс с именем приложеня
             text = stringResource(R.string.app_name),
             modifier = Modifier.padding(start = dimensionResource(R.dimen.padding_medium)),
             color = MaterialTheme.colorScheme.onPrimary,
             style = MaterialTheme.typography.titleLarge,
         )
-        IconButton(
+        IconButton(//Кнопка share
             onClick = onShareButtonClicked,
             modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_medium)),
         ) {
@@ -221,6 +224,7 @@ private fun DessertClickerAppBar(
 }
 
 @Composable
+//Основной UI, где стена, стол, блюдце, а на нём имзеняемое изображение с дессертом.
 fun DessertClickerScreen(
     revenue: Int,
     dessertsSold: Int,
