@@ -124,19 +124,22 @@ class MainActivity : ComponentActivity() {
                 // а на нём имзеняемое изображение с дессертом.
                 //А вывзывается это внутри САМОГО Основного DessertClickerApp
 
-                revenue = revenue, //
-                dessertsSold = dessertsSold,
-                dessertImageId = currentDessertImageId,
-                onDessertClicked = {
+                revenue = revenue, // Параметр дохода
+                dessertsSold = dessertsSold, //параметр кол-ва проданных десертов
+                dessertImageId = currentDessertImageId, //ID текущего изображения десерта
 
-                    // Update the revenue
+                onDessertClicked = {
+                    //  По клике на картинку с десертом обновляем уровень дохода, плюсуя цену текущего
+                    //  десерта к общей, а так же увеличивается кол-во проданных десертов
                     revenue += currentDessertPrice
                     dessertsSold++
 
-                    // Show the next dessert
+                    // Затем отсюда вызываем метод determineDessertToShow
                     val dessertToShow = determineDessertToShow(desserts, dessertsSold)
-                    currentDessertImageId = dessertToShow.imageId
-                    currentDessertPrice = dessertToShow.price
+                    //Он выполняется и предоставляет актуальный элемент листа Десертов
+                    //После чего из этого листа можно зацепить значения для параметров DessertClickerScreen
+                    currentDessertImageId = dessertToShow.imageId //и из этого элемента берем параметр ИД картинки
+                    currentDessertPrice = dessertToShow.price //и цену текущего десерта
                 },
                 modifier = Modifier.padding(contentPadding)
             )
@@ -146,13 +149,13 @@ class MainActivity : ComponentActivity() {
 
 fun determineDessertToShow( //Определяет КАКОЙ десерт будет показан - НЕ Compose функция
     //Используется DessertClickerScreen, который ОСНОВНОЙ UI Compose
-    desserts: List<Dessert>,
-    dessertsSold: Int
-): Dessert {
-    var dessertToShow = desserts.first()
-    for (dessert in desserts) {
-        if (dessertsSold >= dessert.startProductionAmount) {
-            dessertToShow = dessert
+    desserts: List<Dessert>, //Параметр принимающий лист с десертами
+    dessertsSold: Int //Параметр принимающий кол-во проданных десертов
+): Dessert { //возвращает тип Dessert
+    var dessertToShow = desserts.first() //переменная типа Dessert, которая будет возвращаться этой функцией
+    for (dessert in desserts) { //цикл по обходу листа с десертами
+        if (dessertsSold >= dessert.startProductionAmount) {//когда sold сравнивается с SPA элемента, элемент
+            dessertToShow = dessert //отображается на экране
         } else {
             // The list of desserts is sorted by startProductionAmount. As you sell more desserts,
             // you'll start producing more expensive desserts as determined by startProductionAmount
