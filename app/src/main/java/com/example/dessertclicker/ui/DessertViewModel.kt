@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.update
 class DessertViewModel : ViewModel() {
 
     //Объект класса данных, описывающий: текущий индекс дессерта, кол-во продаж, доход,
-    // цена текущего десерта, изображение десерта. //Видимость только внутри класса,
+    // цена текущего десерта, изображение десерта. //Видимость только внутри класса, можно изменять
     private val _dessertUiState = MutableStateFlow(DessertUiState())
 
     //Для чтения из других классов,но не изменения
@@ -37,18 +37,17 @@ class DessertViewModel : ViewModel() {
 
     private fun determineDessertIndex(dessertsSold: Int): Int { //на вход хватаем кол-во проданных десертов
         var dessertIndex = 0
-        for (index in dessertList.indices) {
-            if (dessertsSold >= dessertList[index].startProductionAmount) {
-                dessertIndex = index
+        for (index in dessertList.indices) { //обходим лист с десертами по индексам
+            if (dessertsSold >= dessertList[index].startProductionAmount) { //если кол-во проданных десертов
+                //>= SPA попвашегося при обходе десерта
+                dessertIndex = index //присваиваем переменной, которую возвращает функция, этот индекс
             } else {
-                // The list of desserts is sorted by startProductionAmount. As you sell more
-                // desserts, you'll start producing more expensive desserts as determined by
-                // startProductionAmount. We know to break as soon as we see a dessert who's
-                // "startProductionAmount" is greater than the amount sold.
+                //или просто прерываем цикл (я так понял что бы за зря не тратить ресурсы)
                 break
             }
         }
-        return dessertIndex
+        return dessertIndex //возвращаем нужный индекс
+        //в этом приложении по факту эта функция так или иначе вызывается при клике.
     }
 
 
