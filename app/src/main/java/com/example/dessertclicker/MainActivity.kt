@@ -77,7 +77,8 @@ class MainActivity : ComponentActivity() {
     private fun DessertClickerApp(//параметр типа кастомного класса подключенный к
         viewModel: DessertViewModel = viewModel()  //параметр принимает сам себя? но нет () же
     ) {
-        val uiState by viewModel.dessertUiState.collectAsState()
+        val uiState by viewModel.dessertUiState.collectAsState() //!Из этого uiState и будут взяты
+        //все значения для функций ниже!!
         DessertClickerApp(
             uiState = uiState,//берем UI state из переменной выше
             onDessertClicked = viewModel::onDessertClicked //берем onDessertClicked из Вью Модели
@@ -93,17 +94,21 @@ class MainActivity : ComponentActivity() {
         modifier: Modifier = Modifier
     ) {
 
-        var revenue by rememberSaveable { mutableStateOf(0) } //доход
-        var dessertsSold by rememberSaveable { mutableStateOf(0) } //продано дессертов
 
-        val currentDessertIndex by rememberSaveable { mutableStateOf(0) } //индекс текущего десерта
+        val DessertVM : DessertViewModel = viewModel() //Создаем экземпляр VM ссылающийся на DessertVM
 
-        var currentDessertPrice by rememberSaveable {//цена текущего десерта
-            mutableStateOf(desserts[currentDessertIndex].price)
-        }
-        var currentDessertImageId by rememberSaveable { //ID текущего десерта
-            mutableStateOf(desserts[currentDessertIndex].imageId)
-        }
+//        var revenue by rememberSaveable { mutableStateOf(0) } //доход
+//
+//        var dessertsSold by rememberSaveable { mutableStateOf(0) } //продано дессертов
+//
+//        val currentDessertIndex by rememberSaveable { mutableStateOf(0) } //индекс текущего десерта
+//
+//        var currentDessertPrice by rememberSaveable {//цена текущего десерта
+//            mutableStateOf(desserts[currentDessertIndex].price)
+//        }
+//        var currentDessertImageId by rememberSaveable { //ID текущего десерта
+//            mutableStateOf(desserts[currentDessertIndex].imageId)
+//        }
 
         Scaffold(//идёт внутри основго компоуза - DessertClickerApp
             topBar = { //верхний бар
@@ -113,8 +118,8 @@ class MainActivity : ComponentActivity() {
                         shareSoldDessertsInformation( //поделится инфой о кол-ве проданных и сумме дохода
                             //Сама эта функция описана ниже
                             intentContext = intentContext, // Интент - пока не знаю как работает
-                            dessertsSold = dessertsSold, //кол-во проданных десертов
-                            revenue = revenue //доход
+                            dessertsSold = uiState.dessertsSold, //кол-во проданных десертов
+                            revenue = uiState.revenue //доход
                         )
                     },
                     modifier = Modifier
@@ -128,32 +133,33 @@ class MainActivity : ComponentActivity() {
                 //Она ОПИСАНа ниже, это так же созданная функция
                 //А вывзывается это внутри САМОГО Основного DessertClickerApp
 
-                revenue = revenue, // ПАРАМЕТР дохода
-                dessertsSold = dessertsSold, //ПАРАМЕТР кол-ва проданных десертов
-                dessertImageId = currentDessertImageId, //ПАРАМЕТР ID текущего изображения десерта
+                revenue = uiState.revenue, // ПАРАМЕТР дохода
+                dessertsSold = uiState.dessertsSold, //ПАРАМЕТР кол-ва проданных десертов
+                dessertImageId = uiState.currentDessertImageId, //ПАРАМЕТР ID текущего изображения десерта
 
                 //ПАРАМЕТР -лямба
-                onDessertClicked = {
-                    revenue += currentDessertPrice
-                    //  По клике на картинку с десертом обновляем уровень дохода, плюсуя цену текущего
-                    dessertsSold++
-                    //  десерта к общей, а так же увеличивается кол-во проданных десертов
-
-                    // Затем отсюда ВЫЗЫВАЕТСЯ метод determineDessertToShow, описанный НИЖЕ
-                    val dessertToShow = determineDessertToShow(
-                        desserts,//берется из основной DessertClickerApp ф-ции, которой передается через параметр
-                        dessertsSold //берется из тела основной DessertClickerApp ф-ции, в которой закодирован
-                    )
-                    //Он выполняется и предоставляет актуальный элемент листа Десертов - Dessert
-                    // (return dessertToShow : Dessert)
-
-                    //После чего из этого листа Dessert можно зацепить значения для параметров DessertClickerScreen
-                    //и всё это внутри этой же лямбды происходит
-                    currentDessertImageId = dessertToShow.imageId //и из этого элемента берем параметр ИД картинки
-                    currentDessertPrice = dessertToShow.price //и цену текущего десерта
-                    //и эти выполненные внутри лямбды обновления снова получается идут в DessertClickerScreen?
-                        //именно Screen, не App
-                },
+                onDessertClicked = onDessertClicked,//берется из DessetViewModel!
+//                {
+//                    uiState.revenue += uiState.currentDessertPrice
+//                    //  По клике на картинку с десертом обновляем уровень дохода, плюсуя цену текущего
+//                    uiState.dessertsSold++
+//                    //  десерта к общей, а так же увеличивается кол-во проданных десертов
+//
+//                    // Затем отсюда ВЫЗЫВАЕТСЯ метод determineDessertToShow, описанный НИЖЕ
+//                    val dessertToShow = determineDessertToShow(
+//                        uiState.desserts,//берется из основной DessertClickerApp ф-ции, которой передается через параметр
+//                        uiState.dessertsSold //берется из тела основной DessertClickerApp ф-ции, в которой закодирован
+//                    )
+//                    //Он выполняется и предоставляет актуальный элемент листа Десертов - Dessert
+//                    // (return dessertToShow : Dessert)
+//
+//                    //После чего из этого листа Dessert можно зацепить значения для параметров DessertClickerScreen
+//                    //и всё это внутри этой же лямбды происходит
+//                    uiState.currentDessertImageId = dessertToShow.imageId //и из этого элемента берем параметр ИД картинки
+//                    uiState.currentDessertPrice = dessertToShow.price //и цену текущего десерта
+//                    //и эти выполненные внутри лямбды обновления снова получается идут в DessertClickerScreen?
+//                        //именно Screen, не App
+//                },
                 //КОНЕЦ ПАРМЕТРА-ЛЯМБДЫ
                 modifier = Modifier.padding(contentPadding)
             )
@@ -161,26 +167,26 @@ class MainActivity : ComponentActivity() {
     }
 
 
-fun determineDessertToShow( //Определяет КАКОЙ десерт будет показан - НЕ Compose функция
-    //Используется DessertClickerScreen, который ОСНОВНОЙ UI Compose
-    desserts: List<Dessert>, //Параметр принимающий лист с десертами
-    dessertsSold: Int //Параметр принимающий кол-во проданных десертов
-): Dessert { //возвращает тип Dessert
-    var dessertToShow = desserts.first() //переменная типа Dessert, которая будет возвращаться этой функцией
-    for (dessert in desserts) { //цикл по обходу листа с десертами
-        if (dessertsSold >= dessert.startProductionAmount) {//когда sold сравнивается с SPA элемента, элемент
-            dessertToShow = dessert //отображается на экране
-        } else {
-            // The list of desserts is sorted by startProductionAmount. As you sell more desserts,
-            // you'll start producing more expensive desserts as determined by startProductionAmount
-            // We know to break as soon as we see a dessert who's "startProductionAmount" is greater
-            // than the amount sold.
-            break
-        }
-    }
-
-    return dessertToShow
-}
+//fun determineDessertToShow( //Определяет КАКОЙ десерт будет показан - НЕ Compose функция
+//    //Используется DessertClickerScreen, который ОСНОВНОЙ UI Compose
+//    desserts: List<Dessert>, //Параметр принимающий лист с десертами
+//    dessertsSold: Int //Параметр принимающий кол-во проданных десертов
+//): Dessert { //возвращает тип Dessert
+//    var dessertToShow = desserts.first() //переменная типа Dessert, которая будет возвращаться этой функцией
+//    for (dessert in desserts) { //цикл по обходу листа с десертами
+//        if (dessertsSold >= dessert.startProductionAmount) {//когда sold сравнивается с SPA элемента, элемент
+//            dessertToShow = dessert //отображается на экране
+//        } else {
+//            // The list of desserts is sorted by startProductionAmount. As you sell more desserts,
+//            // you'll start producing more expensive desserts as determined by startProductionAmount
+//            // We know to break as soon as we see a dessert who's "startProductionAmount" is greater
+//            // than the amount sold.
+//            break
+//        }
+//    }
+//
+//    return dessertToShow
+//}
 
 /** Хуй его как это работает, эти Интенты, кароче это функция, которая кста НЕ КОМПОУЗ, отвечает за обработку шейр
  * Share desserts sold information using ACTION_SEND intent
